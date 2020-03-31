@@ -15,6 +15,43 @@ class App extends React.Component {
     }
   }
 
+  onChangeType = (event) => {
+    console.log(event.target.value)
+    this.setState( {filters: {type: `${event.target.value}`}})
+  }
+
+  onAdoptPet = (id) => {
+    console.log("You hit adopt pet")
+    console.log(id)
+    let newPetArray = this.state.pets.map(pet => {
+      if(pet.id === id){
+        pet.isAdopted = true
+      }
+      return pet
+    })
+
+    this.setState({pet: newPetArray})
+  }
+
+
+  onFindPetsClick = () => {
+    let url = "/api/pets"
+    if (this.state.filters.type === "dog") {
+      url = "/api/pets?type=dog"
+    } else if (this.state.filters.type === "cat") {
+      url = "/api/pets?type=cat"
+  } else if (this.state.filters.type === "micropig") {
+      url = "/api/pets?type=micropig"
+  }
+
+    console.log("You hit onFindPetsClick in App.js")
+    fetch(url)
+      .then(resp => resp.json())
+      .then(animals => {
+        this.setState( {pets: animals})
+      })
+  }
+
   render() {
     return (
       <div className="ui container">
@@ -24,10 +61,10 @@ class App extends React.Component {
         <div className="ui container">
           <div className="ui grid">
             <div className="four wide column">
-              <Filters />
+              <Filters filterChange = {this.onChangeType} findPet={this.onFindPetsClick}/>
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser pets= {this.state.pets} adopt= {this.onAdoptPet} />
             </div>
           </div>
         </div>
